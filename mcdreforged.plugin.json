@@ -5,8 +5,12 @@
 	"description": "管理 carpet 机器人",
 	"author": "DancingSnow",
 	"link": "https://github.com/",
+	"resources": [
+		"resources",
+		"LICENSE"
+	],
 	"dependencies": {
-		"mcdreforged": ">=2.0.0-alpha.1",
+		"mcdreforged": ">=2.3.0",
 		"minecraft_data_api": ">=1.4.0"
 	}
 }

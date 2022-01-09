@@ -5,7 +5,7 @@ import os.path
 from mcdreforged.api.all import *
 from mcdreforged.translation.translation_text import RTextMCDRTranslation
 
-from plugins.bot_plugin.bot_plugin.Config import Config, BotInfo, CommandInfo
+from bot_plugin.Config import Config, BotInfo, CommandInfo
 
 config: Config
 plugin_server: PluginServerInterface
@@ -33,10 +33,19 @@ colors = [
     '#a5673f',
     '#8799a3'
 ]
+helps = [
+    'list',
+    'add',
+    'remove',
+    'modify',
+    'run',
+    'reload',
+    'info'
+]
 
 
 def tr(translation_key: str, *args) -> RTextMCDRTranslation:
-    return ServerInterface.get_instance().rtr(translation_key.format(PLUGIN_ID), args)
+    return ServerInterface.get_instance().rtr(translation_key.format(PLUGIN_ID), *args)
 
 
 def save_config():
@@ -49,7 +58,13 @@ def load_config():
 
 
 def print_help_massage(source: PlayerCommandSource):
-    source.reply(tr('massage.{}.help_msg'))
+    def to_help_msg(prefix: str, des: str) -> list:
+        ret = [{'text': prefix + f' {des} ', 'color': '#999D9C'}, tr('help.{}.' + des).set_color(RColor.white).to_json_object()]
+        return ret
+    player = source.player
+    server = source.get_server()
+    for i in helps:
+        server.execute(f'tellraw {player} {json.dumps(to_help_msg(Prefix, i))}')
 
 
 def show_list(source: PlayerCommandSource):
@@ -64,10 +79,32 @@ def show_list(source: PlayerCommandSource):
         raw = []
         black_num = 30
         if len(i) % 2 == 0:
-            raw.append({'text': f'{i}', 'color': '#ACECF2'})
+            raw.append({
+                'text': f'{i}',
+                'color': '#ED6DF1',
+                "hoverEvent": {
+                    "action": "show_text",
+                    "value": "单击显示信息"
+                },
+                'clickEvent': {
+                    'action': 'run_command',
+                    'value': f'{Prefix} info {i}'
+                }
+            })
             black_num = int(black_num - len(i) / 2 * 3)
         else:
-            raw.append({'text': f'{i} ', 'color': '#ACECF2'})
+            raw.append({
+                'text': f'{i} ',
+                'color': '#ED6DF1',
+                "hoverEvent": {
+                    "action": "show_text",
+                    "value": "单击显示信息"
+                },
+                'clickEvent': {
+                    'action': 'run_command',
+                    'value': f'{Prefix} info {i}'
+                }
+            })
             black_num = int(black_num - len(i) / 2 * 3 - 1)
         b = ''
         for j in range(black_num):
@@ -99,6 +136,8 @@ def show_list(source: PlayerCommandSource):
             'color': 'green'
         })
         server.execute(f'tellraw {source.player} {json.dumps(raw)}')
+    print(len(config.bots))
+    source.reply(tr('massage.{}.bot_totle', len(config.bots)))
 
 
 @new_thread(PLUGIN_ID)
@@ -118,7 +157,7 @@ def add_bot(source: PlayerCommandSource, msg):
                 pos.z],
             rotation=rotation,
             dim=dim_id[dim],
-            commands={"S": CommandInfo(cmd='spawn')})
+            commands={"S": CommandInfo(cmd='spawn', color=colors[0])})
         save_config()
         source.reply(tr('massage.{}.bot_add_success').set_color(RColor.green))
     else:
@@ -180,12 +219,11 @@ def reload(source: PlayerCommandSource):
     source.reply(tr('massage.{}.reload_success').set_color(RColor.green))
 
 
-def fix_name(server: ServerInterface, name: str):
+def fix_name(server: ServerInterface, name: str) -> str:
     api = server.get_plugin_instance('minecraft_data_api')
     amount, limit, player_list = api.get_server_player_list()
     for i in player_list:
         if i.upper() == name.upper():
-            print(i)
             return i
     return name
 
@@ -199,15 +237,28 @@ def run(source: PlayerCommandSource, msg):
         if msg['key'] in config.bots[name].commands:
             if config.bots[name].commands[key].cmd == 'spawn':
                 info = config.bots[name]
-                server.execute(f'execute as {source.player} run player {name} {config.bots[name].commands[key].cmd} at {info.pos[0]} {info.pos[1]} {info.pos[2]} facing {info.rotation[0]} {info.rotation[1]} in {info.dim}')
+                server.execute(
+                    f'execute as {source.player} run player {name} {config.bots[name].commands[key].cmd} at {info.pos[0]} {info.pos[1]} {info.pos[2]} facing {info.rotation[0]} {info.rotation[1]} in {info.dim}')
             else:
                 bot_name = fix_name(source.get_server(), config.bot_prefix + name + config.bot_suffix)
                 print(bot_name)
-                server.execute(f'execute as {source.player} run player {bot_name} {config.bots[name].commands[key].cmd}')
+                server.execute(
+                    f'execute as {source.player} run player {bot_name} {config.bots[name].commands[key].cmd}')
         else:
             source.reply(tr('massage.{}.key_not_exist').set_color(RColor.red))
     else:
         source.reply(tr('massage.{}.bot_not_exist').set_color(RColor.red))
+
+
+def info(source: PlayerCommandSource, msg):
+    bot_name = msg['name']
+    if bot_name not in config.bots:
+        source.reply(tr('massage.{}.bot_not_exist').set_color(RColor.red))
+        return
+    bot = config.bots[bot_name]
+    source.reply(tr('info.{}.name', bot_name))
+    source.reply(tr('info.{}.detail_pos', bot.dim, int(bot.pos[0]), int(bot.pos[1]), int(bot.pos[2])))
+    source.reply(tr('info.{}.detail_rotation', int(bot.rotation[0]), int(bot.rotation[1])))
 
 
 def register_command(server: PluginServerInterface):
@@ -228,6 +279,7 @@ def register_command(server: PluginServerInterface):
         ).
             then(
             get_literal_node('add').
+                runs(lambda src: src.reply(tr('usage.{}.add', Prefix).set_color(RColor.gray))).
                 then(
                 Text('name').
                     at_min_length(1).
@@ -237,6 +289,7 @@ def register_command(server: PluginServerInterface):
         ).
             then(
             get_literal_node('remove').
+                runs(lambda src: src.reply(tr('usage.{}.remove', Prefix).set_color(RColor.gray))).
                 then(
                 Text('name').
                     runs(remove)
@@ -244,12 +297,14 @@ def register_command(server: PluginServerInterface):
         ).
             then(
             get_literal_node('modify').
+                runs(lambda src: src.reply(tr('usage.{}.modify', Prefix).set_color(RColor.gray))).
                 then(
                 Text('name').
                     then(
                     Literal('commands').
+                        runs(lambda src: src.reply(tr('usage.{}.modify_commands', Prefix).set_color(RColor.gray))).
                         then(
-                        Text('key').
+                        Text('key').at_max_length(1).at_min_length(1).
                             then(
                             Literal('add').
                                 then(
@@ -266,19 +321,20 @@ def register_command(server: PluginServerInterface):
                                 then(
                                 Text('color').
                                     runs(lambda src, msg: modifys(src, msg, 'cmd_edit_color'))
-                            ).
+                            )
+                        ).
+                            then(
+                            Literal('cmd').
                                 then(
-                                Literal('cmd').
-                                    then(
-                                    Text('cmd').
-                                        runs(lambda src, msg: modifys(src, msg, 'cmd_edit_cmd'))
-                                )
+                                GreedyText('cmd').
+                                    runs(lambda src, msg: modifys(src, msg, 'cmd_edit_cmd'))
                             )
                         )
                     )
                 ).
                     then(
                     Literal('name').
+                        runs(lambda src: src.reply(tr('usage.{}.modify_name', Prefix).set_color(RColor.gray))).
                         then(
                         Text('new_name').
                             runs(lambda src, msg: modifys(src, msg, 'change_name'))
@@ -292,12 +348,21 @@ def register_command(server: PluginServerInterface):
         ).
             then(
             Literal('run').
+                runs(lambda src: src.reply(tr('usage.{}.run', Prefix).set_color(RColor.gray))).
                 then(
                 Text('name').
                     then(
                     Text('key').
                         runs(run)
                 )
+            )
+        ).
+            then(
+            Literal('info').
+            runs(lambda src: src.reply(tr('usage.{}.info', Prefix).set_color(RColor.gray))).
+                then(
+                Text('name').
+                    runs(info)
             )
         )
     )

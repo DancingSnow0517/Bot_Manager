@@ -11,5 +11,26 @@
   "massage.bot_plugin.command_remove_success": "移除命令成功",
   "massage.bot_plugin.change_color_success": "更改颜色成功",
   "massage.bot_plugin.change_name_success": "更改名字成功",
-  "massage.bot_plugin.reload_success": "重载成功"
+  "massage.bot_plugin.reload_success": "重载成功",
+  "massage.bot_plugin.bot_totle": "当前共有 §e{0}§r 个bot",
+
+  "help.bot_plugin.list": "显示当前bot列表",
+  "help.bot_plugin.add": "在你的位置添加一个bot",
+  "help.bot_plugin.remove": "移除一个bot",
+  "help.bot_plugin.modify": "编辑你的bot名称或命令",
+  "help.bot_plugin.run": "运行bot的命令",
+  "help.bot_plugin.reload": "重载配置文件",
+  "help.bot_plugin.info": "查看bot详细信息",
+
+  "usage.bot_plugin.add": "用法: {0} add [name]",
+  "usage.bot_plugin.remove": "用法: {0} remove [name]",
+  "usage.bot_plugin.modify": "用法: {0} modify [name] [commands | name]",
+  "usage.bot_plugin.run": "用法: {0} run [name] [key]",
+  "usage.bot_plugin.info": "用法: {0} info [name]",
+  "usage.bot_plugin.modify_commands": "用法: {0} modify [name] commands [key] [add | remove | color | cmd]",
+  "usage.bot_plugin.modify_name": "用法: {0} modify [old_name] name [new_name]",
+
+  "info.bot_plugin.name": "§b\"{0}\" :",
+  "info.bot_plugin.detail_pos": " - 坐标 : §d{0} §a[{1}, {2}, {3}]",
+  "info.bot_plugin.detail_rotation": " - 指向 : §a[{0}, {1}]"
 }

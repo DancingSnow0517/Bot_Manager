@@ -4,8 +4,8 @@ from mcdreforged.utils.serializer import Serializable
 
 
 class CommandInfo(Serializable):
-    cmd: str = ''
-    color: str = ''
+    cmd: str = 'spawn'
+    color: str = '#ED6DF1'
 
 
 class BotInfo(Serializable):
@@ -27,7 +27,8 @@ class Config(Serializable):
         "remove": 2,
         "modify": 2,
         "run": 0,
-        "reload": 2
+        "reload": 2,
+        "info": 0
     }
     bot_prefix: str = ''
     bot_suffix: str = ''
