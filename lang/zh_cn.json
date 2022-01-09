@@ -13,6 +13,7 @@
   "massage.bot_plugin.change_name_success": "更改名字成功",
   "massage.bot_plugin.reload_success": "重载成功",
   "massage.bot_plugin.bot_totle": "当前共有 §e{0}§r 个bot",
+  "massage.bot_plugin.bot": "查看插件使用帮助",
 
   "help.bot_plugin.list": "显示当前bot列表",
   "help.bot_plugin.add": "在你的位置添加一个bot",

@@ -378,6 +378,7 @@ def on_load(server: PluginServerInterface, old_module):
     plugin_server = server
     load_config()
     register_command(server)
+    server.register_help_message(Prefix, tr('massage.{}.bot'))
 
 
 def on_unload(server: PluginServerInterface):
