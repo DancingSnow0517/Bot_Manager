@@ -1,0 +1,15 @@
+{
+  "massage.bot_plugin.permission_denied": "你没有权限！",
+  "massage.bot_plugin.help_msg": "123\n112233\n111222333",
+  "massage.bot_plugin.bot_exist": "bot名字不能重复",
+  "massage.bot_plugin.bot_add_success": "bot添加成功",
+  "massage.bot_plugin.bot_not_exist": "bot不存在",
+  "massage.bot_plugin.bot_remove_success": "删除bot成功",
+  "massage.bot_plugin.command_add_success": "添加命令成功",
+  "massage.bot_plugin.key_exist": "键已存在",
+  "massage.bot_plugin.key_not_exist": "键不存在",
+  "massage.bot_plugin.command_remove_success": "移除命令成功",
+  "massage.bot_plugin.change_color_success": "更改颜色成功",
+  "massage.bot_plugin.change_name_success": "更改名字成功",
+  "massage.bot_plugin.reload_success": "重载成功"
+}

@@ -1,0 +1,12 @@
+{
+	"id": "bot_plugin",
+	"version": "1.0.0",
+	"name": "Bot Plugin",
+	"description": "管理 carpet 机器人",
+	"author": "DancingSnow",
+	"link": "https://github.com/",
+	"dependencies": {
+		"mcdreforged": ">=2.0.0-alpha.1",
+		"minecraft_data_api": ">=1.4.0"
+	}
+}
