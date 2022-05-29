@@ -1,0 +1,37 @@
+{
+  "massage.bot_plugin.permission_denied": "Permission denied!",
+  "massage.bot_plugin.help_msg": "123\n112233\n111222333",
+  "massage.bot_plugin.bot_exist": "Cannot readd existing bot",
+  "massage.bot_plugin.bot_add_success": "Bot added",
+  "massage.bot_plugin.bot_not_exist": "Bot does not exist",
+  "massage.bot_plugin.bot_remove_success": "Bot removed",
+  "massage.bot_plugin.command_add_success": "Command added",
+  "massage.bot_plugin.key_exist": "Key exists",
+  "massage.bot_plugin.key_not_exist": "Key does not exist",
+  "massage.bot_plugin.command_remove_success": "Command removed",
+  "massage.bot_plugin.change_color_success": "Color changed",
+  "massage.bot_plugin.change_name_success": "Bot renamed",
+  "massage.bot_plugin.reload_success": "Reload success",
+  "massage.bot_plugin.bot_total": "Total bot count: §e{0}§r",
+  "massage.bot_plugin.bot": "Show help",
+
+  "help.bot_plugin.list": "List all available bots",
+  "help.bot_plugin.add": "Add a bot using your pos and facing",
+  "help.bot_plugin.remove": "Remove bot",
+  "help.bot_plugin.modify": "Edit bot name or command",
+  "help.bot_plugin.run": "Execute selected bot command",
+  "help.bot_plugin.reload": "Reload configuration",
+  "help.bot_plugin.info": "Show bot pos and facing",
+
+  "usage.bot_plugin.add": "Usage: {0} add [name]",
+  "usage.bot_plugin.remove": "Usage: {0} remove [name]",
+  "usage.bot_plugin.modify": "Usage: {0} modify [name] [commands | name]",
+  "usage.bot_plugin.run": "Usage: {0} run [name] [key]",
+  "usage.bot_plugin.info": "Usage: {0} info [name]",
+  "usage.bot_plugin.modify_commands": "Usage: {0} modify [name] commands [key] [add | remove | color | cmd]",
+  "usage.bot_plugin.rename": "Usage: {0} modify [old_name] name [new_name]",
+
+  "info.bot_plugin.name": "§b\"{0}\" :",
+  "info.bot_plugin.detail_pos": " - Pos : §d{0} §a[{1}, {2}, {3}]",
+  "info.bot_plugin.detail_rotation": " - Facing : §a[{0}, {1}]"
+}
