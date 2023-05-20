@@ -9,15 +9,18 @@
   "help.bot_plugin.run": "Execute selected bot command",
   "help.bot_plugin.setcmd": "Edit bot actions",
 
+  "info.bot_plugin.add_cmd": "Click to add a bot command",
   "info.bot_plugin.detail_pos": " - Pos : §d{0} §a[{1}, {2}, {3}]",
   "info.bot_plugin.detail_rotation": " - Facing : §a[{0}, {1}]",
   "info.bot_plugin.name": "§b\"{0}\" :",
+  "info.bot_plugin.setorder_d": "Click to move bot down",
+  "info.bot_plugin.setorder_u": "Click to move bot up",
+  "info.bot_plugin.show_text": "Click to display bot info",
 
-  "message.bot_plugin.add_cmd": "Click to add a bot command",
+  "message.bot_plugin.bad_executor_type": "Cannot execute command with current source",
   "message.bot_plugin.bot": "Show help for this plugin",
   "message.bot_plugin.bot_add_success": "Bot added",
   "message.bot_plugin.bot_delete_success": "Bot deleted",
-  "message.bot_plugin.bad_executor_type": "Cannot execute command with current source",
   "message.bot_plugin.bot_exist": "Cannot add an existing bot",
   "message.bot_plugin.bot_list_title": "List of all bots\n",
   "message.bot_plugin.bot_not_exist": "Bot does not exist",
@@ -32,7 +35,7 @@
   "message.bot_plugin.reload_success": "Reload success",
   "message.bot_plugin.setcmd_overwrite": "Overwriting existing command",
   "message.bot_plugin.setcmd_success": "Command set",
-  "message.bot_plugin.show_text": "Click to display bot info",
+  "message.bot_plugin.setorder_success": "Bot reordered",
 
   "usage.bot_plugin.add": "Usage: {0} add [name]",
   "usage.bot_plugin.del": "Usage: {0} del [name]",
@@ -40,5 +43,6 @@
   "usage.bot_plugin.move": "Usage: {0} move [x] [y] [z]",
   "usage.bot_plugin.rename": "Usage: {0} rename [old_name] [new_name]",
   "usage.bot_plugin.run": "Usage: {0} run [name] [key]",
-  "usage.bot_plugin.setcmd": "Usage: {0} setcmd [name] [key] [cmd]"
+  "usage.bot_plugin.setcmd": "Usage: {0} setcmd [name] [key] [cmd]",
+  "usage.bot_plugin.setorder": "Usage: {0} setorder [name] to [x] | add [offset]"
 }

@@ -9,15 +9,18 @@
   "help.bot_plugin.run": "运行bot的命令",
   "help.bot_plugin.setcmd": "编辑bot的命令",
 
+  "info.bot_plugin.add_cmd": "单击添加命令",
   "info.bot_plugin.detail_pos": " - 坐标 : §d{0} §a[{1}, {2}, {3}]",
   "info.bot_plugin.detail_rotation": " - 指向 : §a[{0}, {1}]",
   "info.bot_plugin.name": "§b\"{0}\" :",
+  "info.bot_plugin.setorder_d": "单击向下移动bot的列表位置",
+  "info.bot_plugin.setorder_u": "单击向上移动bot的列表位置",
+  "info.bot_plugin.show_text": "单击显示信息",
 
-  "message.bot_plugin.add_cmd": "单击添加命令",
+  "message.bot_plugin.bad_executor_type": "无法执行，命令源不匹配",
   "massage.bot_plugin.bot": "查看插件使用帮助",
   "message.bot_plugin.bot_add_success": "bot添加成功",
   "message.bot_plugin.bot_delete_success": "bot删除成功",
-  "message.bot_plugin.bad_executor_type": "无法执行，命令源不匹配",
   "message.bot_plugin.bot_exist": "bot名字不能重复",
   "message.bot_plugin.bot_list_title": "当前已添加的bot",
   "message.bot_plugin.bot_not_exist": "bot不存在",
@@ -32,7 +35,7 @@
   "message.bot_plugin.reload_success": "重载成功",
   "message.bot_plugin.setcmd_overwrite": "覆盖了一条已有命令",
   "message.bot_plugin.setcmd_success": "bot命令设置成功",
-  "message.bot_plugin.show_text": "单击显示信息",
+  "message.bot_plugin.setorder_success": "bot顺序调整成功",
 
   "usage.bot_plugin.add": "用法: {0} add [name]",
   "usage.bot_plugin.del": "用法: {0} del [name]",
@@ -40,5 +43,6 @@
   "usage.bot_plugin.move": "用法: {0} move [x] [y] [z]",
   "usage.bot_plugin.rename": "用法: {0} rename [old_name] [new_name]",
   "usage.bot_plugin.run": "用法: {0} run [name] [key]",
-  "usage.bot_plugin.setcmd": "用法: {0} setcmd [name] [key] [cmd]"
+  "usage.bot_plugin.setcmd": "用法: {0} setcmd [name] [key] [cmd]",
+  "usage.bot_plugin.setorder": "用法: {0} setorder [name] to [x] | add [offset]"
 }
