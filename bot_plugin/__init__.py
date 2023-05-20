@@ -206,6 +206,13 @@ def print_help_message(source: CommandSource):
             source.reply(tr('help.{}.' + i))
 
 
+def check_bot_name(source: CommandSource, name: str):
+    if name not in config.bots:
+        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
+        return False
+    return True
+
+
 @new_thread(PLUGIN_ID)
 def show_list(source: CommandSource):
     '''
@@ -246,10 +253,15 @@ def show_list(source: CommandSource):
         # 收集完毕，开始输出
     if isinstance(source, PlayerCommandSource):
         raw = []
+        # 按设置的顺序对收集的bot重新排序
+        # 默认的顺序是alphabetic
+        entries=sorted(entries,key=lambda e:e[0]) if config.display_order=='alphabetic'\
+             else sorted(entries,key=lambda e:config.bots[e[0]].display_index) if config.display_order=='numeric'\
+             else entries
         for bot_data in entries:
             # entries: [bot名称, 留白区域, (指令按钮,指令内容)*n]
             bot_name = bot_data[0]
-            show_text_str = tr('message.{}.show_text')
+            show_text_str = tr('info.{}.show_text')
             # 可点击的bot名称，留白区域也要可以点
             name_raw = {
                 'text': f'{bot_name+bot_data[1]}',
@@ -281,13 +293,13 @@ def show_list(source: CommandSource):
                     },
                     'clickEvent': {
                         'action': 'run_command',
-                        'value': f'{Prefix} run {display_name} {cmd[0]}'
+                        'value': f'{Prefix} run {bot_name} {cmd[0]}'
                     },
                     'color': config.bots[bot_name].commands[cmd[0]].color
                 }
                 raw.append(action_raw)
             # 显示一个添加命令用的按钮
-            show_text_str = tr('message.{}.add_cmd')
+            show_text_str = tr('info.{}.add_cmd')
             action_raw = {
                 'text': ' [+]',
                 'hoverEvent': {
@@ -298,11 +310,36 @@ def show_list(source: CommandSource):
                     'action': 'suggest_command',
                     'value': f'{Prefix} setcmd {bot_name} <key> <command>'
                 },
-                'color': '#FF7F00'
+                'color': '#00FF7F'
             }
             raw.append(action_raw)
+            if config.display_order == 'numeric':
+                # 显示一对表示向上向下移动bot顺序用的按钮
+                for j in [0, 1]:
+                    show_text_str = tr('info.{}.setorder_' +
+                                       ('u' if j == 0 else 'd'))
+                    order = config.bots[bot_name].display_index
+                    # 第一个bot没有上箭头，最后一个bot没有下箭头
+                    arrow='↑' if j==0 and order!=0 else \
+                        '↓' if j==1 and order!=len(config.bots)-1 else ''
+                    action_raw = {
+                        'text': f' [{arrow}]',
+                        'hoverEvent': {
+                            'action': 'show_text',
+                            'value': f'{show_text_str}'
+                        },
+                        'clickEvent': {
+                            'action': 'run_command',
+                            'value':
+                            f'{Prefix} setorder {bot_name} add {2*j-1}'
+                            # 上箭头-1，下箭头+1
+                        },
+                        'color': '#00FF7F'
+                    }
+                    if arrow != '':
+                        raw.append(action_raw)
             raw.append('\n')
-        source.reply(tr('message.{}.bot_list_title'))
+        source.reply(tr('message.{}.bot_list_title').set_styles(RStyle.bold))
         server.execute(f'tellraw {source.player} {json.dumps(raw)}')
         source.reply(tr('message.{}.bot_total', len(config.bots)))
     else:
@@ -338,9 +375,12 @@ def add_bot_p(source: CommandSource, ctx):
         pos = api.get_player_coordinate(source.player)
         dim = api.get_player_dimension(source.player)
         rotation = api.get_player_info(source.player, 'Rotation')
+        # 新bot的display_order最大，表示放在最后
+        display_index = len(config.bots)
         config.bots[bot_name] = BotInfo(pos=[pos.x, pos.y, pos.z],
                                         rotation=rotation,
                                         dim=dim_id[dim],
+                                        display_index=display_index,
                                         commands={
                                             's':
                                             CommandInfo(cmd='spawn',
@@ -384,6 +424,7 @@ def add_bot_c(source: CommandSource, ctx):
                 else:
                     source.reply(tr('message.{}.bad_executor_type'))
                     source.reply(tr('message.{}.reject_console_action'))
+                    return
             #只有1个额外参数，参数直接处理为维度
             if len(other) == 1:
                 dim = int(other[0])
@@ -405,10 +446,12 @@ def add_bot_c(source: CommandSource, ctx):
                 if dim not in dim_id.keys():
                     raise IllegalArgument()
                 rotation = (int(other[0]), int(other[1]))
-
+            # 新bot的display_order最大，表示放在最后
+            display_index = len(config.bots)
             config.bots[bot_name] = BotInfo(pos=pos,
                                             rotation=rotation,
                                             dim=dim_id[dim],
+                                            display_index=display_index,
                                             commands={
                                                 's':
                                                 CommandInfo(cmd='spawn',
@@ -470,39 +513,35 @@ def reload(source: CommandSource):
 def move(source: CommandSource, ctx):
     global config
     bot_name = ctx['name']
-    if bot_name not in config.bots:
-        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
-        return
-    pos = [ctx['x'], ctx['y'], ctx['z']]
-    conf2 = config.bots[bot_name]
-    del config.bots[bot_name]
-    conf2.pos = pos
-    config.bots[bot_name] = conf2
-    save_config()
-    source.reply(tr('message.{}.move_success').set_color(RColor.green))
+    if check_bot_name(source, bot_name):
+        pos = [ctx['x'], ctx['y'], ctx['z']]
+        conf2 = config.bots[bot_name]
+        del config.bots[bot_name]
+        conf2.pos = pos
+        config.bots[bot_name] = conf2
+        save_config()
+        source.reply(tr('message.{}.move_success').set_color(RColor.green))
 
 
 def rename(source: CommandSource, ctx):
     global config
     bot_name = ctx['name']
-    if bot_name not in config.bots:
-        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
-        return
-    config.bots[ctx['new_name']] = config.bots[bot_name]
-    del config.bots[bot_name]
-    save_config()
-    source.reply(tr('message.{}.change_name_success').set_color(RColor.green))
+    if check_bot_name(source, bot_name):
+        config.bots[ctx['new_name']] = config.bots[bot_name]
+        del config.bots[bot_name]
+        save_config()
+        source.reply(
+            tr('message.{}.change_name_success').set_color(RColor.green))
 
 
 def delete(source: CommandSource, ctx):
     global config
     bot_name = ctx['name']
-    if bot_name not in config.bots:
-        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
-        return
-    del config.bots[bot_name]
-    save_config()
-    source.reply(tr('message.{}.bot_delete_success').set_color(RColor.green))
+    if check_bot_name(source, bot_name):
+        del config.bots[bot_name]
+        save_config()
+        source.reply(
+            tr('message.{}.bot_delete_success').set_color(RColor.green))
 
 
 @new_thread(PLUGIN_ID)
@@ -510,12 +549,16 @@ def run(source: CommandSource, ctx):
     name = ctx['name']
     key = ctx['key']
     server = source.get_server()
-    if ctx['name'] in config.bots:
+    if check_bot_name(source, name):
         if ctx['key'] in config.bots[name].commands:
             if config.bots[name].commands[key].cmd == 'spawn':
+                # 控制台生成的bot默认是创造模式，玩家生成的bot使用与执行指令的玩家相同的游戏模式
+                # 所以对玩家发出的指令，需要借助execute
+                player_run_prefix = f'execute as {source.player} run ' \
+                    if isinstance(source, PlayerCommandSource) else ''
                 info = config.bots[name]
                 server.execute(
-                    f'player {name} spawn at {info.pos[0]} {info.pos[1]} {info.pos[2]} facing {info.rotation[0]} {info.rotation[1]} in {info.dim}'
+                    f'{player_run_prefix}player {name} spawn at {info.pos[0]} {info.pos[1]} {info.pos[2]} facing {info.rotation[0]} {info.rotation[1]} in {info.dim}'
                 )
             else:
                 bot_name = config.bot_prefix + name + config.bot_suffix
@@ -523,28 +566,67 @@ def run(source: CommandSource, ctx):
                     f'player {bot_name} {config.bots[name].commands[key].cmd}')
         else:
             source.reply(tr('message.{}.key_not_exist').set_color(RColor.red))
-    else:
-        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
 
 
 def info(source: CommandSource, ctx):
     name = ctx['name']
-    if name not in config.bots:
-        source.reply(tr('message.{}.bot_not_exist').set_color(RColor.red))
-        return
+    if check_bot_name(source, name):
+        bot = config.bots[name]
+        source.reply(tr('info.{}.name', name))
+        source.reply(
+            tr('info.{}.detail_pos', bot.dim, int(bot.pos[0]), int(bot.pos[1]),
+               int(bot.pos[2])))
+        source.reply(
+            tr('info.{}.detail_rotation', int(bot.rotation[0]),
+               int(bot.rotation[1])))
+
+
+def do_insert(source, name, i):
+    global config
     bot = config.bots[name]
-    source.reply(tr('info.{}.name', name))
-    source.reply(
-        tr('info.{}.detail_pos', bot.dim, int(bot.pos[0]), int(bot.pos[1]),
-           int(bot.pos[2])))
-    source.reply(
-        tr('info.{}.detail_rotation', int(bot.rotation[0]),
-           int(bot.rotation[1])))
+    # 新的索引不能越界
+    new = 0 if i < 0 else len(config.bots) - 1 if i >= len(config.bots) else i
+    # 标记所有需要移动的其他bot
+    # 向前移动，则插入点在前，中间的bot的display_index变大
+    # 向后移动，则插入点在后，中间的bot的display_index变小
+    if bot.display_index < new:
+        affected = range(bot.display_index + 1, new + 1)
+        for _, e in config.bots.items():
+            if e.display_index in affected:
+                e.display_index -= 1
+    else:
+        affected = range(new, bot.display_index + 1)
+        for _, e in config.bots.items():
+            if e.display_index in affected:
+                e.display_index += 1
+    bot.display_index = new
+    save_config()
+    source.reply(tr('message.{}.setorder_success').set_color(RColor.green))
+    show_list(source)
+
+
+def setorder(source: CommandSource, ctx):
+    name = ctx['name']
+    if check_bot_name(source, name):
+        i = ctx['i']
+        if i == config.bots[name].display_index:
+            return
+        do_insert(source, name, i)
+
+
+def updateorder(source: CommandSource, ctx):
+    name = ctx['name']
+    if check_bot_name(source, name):
+        i = int(ctx['i'])
+        if i == 0:
+            return
+        old = config.bots[name].display_index
+        do_insert(source, name, old + i)
 
 
 def register_command(server: PluginServerInterface):
 
-    def get_literal_node(literal):
+    def add_literal_perm_check(literal):
         lvl = config.command_perm.get(literal, 0)
         return Literal(literal).requires(lambda src: src.has_permission(lvl)). \
             on_error(RequirementNotMet,
@@ -554,8 +636,8 @@ def register_command(server: PluginServerInterface):
 
     server.register_command(
         Literal(Prefix).runs(print_help_message).then(
-            get_literal_node('list').runs(show_list)).then(
-                get_literal_node('add').runs(lambda src: src.reply(
+            add_literal_perm_check('list').runs(show_list)).then(
+                add_literal_perm_check('add').runs(lambda src: src.reply(
                     tr('usage.{}.add', Prefix).set_color(RColor.gray))).then(
                         Text('name').in_length_range(
                             1, 16 - len(config.bot_prefix) -
@@ -566,16 +648,16 @@ def register_command(server: PluginServerInterface):
                                             GreedyText('other').runs(
                                                 add_bot_c))))))
             ).then(
-                get_literal_node('del').runs(lambda src: src.reply(
+                add_literal_perm_check('del').runs(lambda src: src.reply(
                     tr('usage.{}.del', Prefix).set_color(RColor.gray))).then(
                         Text('name').runs(delete))).
         then(
-            get_literal_node('setcmd').runs(lambda src: src.reply(
+            add_literal_perm_check('setcmd').runs(lambda src: src.reply(
                 tr('usage.{}.setcmd', Prefix).set_color(RColor.gray))).then(
                     Text('name').then(
                         Text('key').in_length_range(1, 1).then(
                             GreedyText('cmd').runs(setcmd))))
-        ).then(Literal('reload').runs(reload)).then(
+        ).then(add_literal_perm_check('reload').runs(reload)).then(
             Literal('run').runs(lambda src: src.reply(
                 tr('usage.{}.run', Prefix).set_color(RColor.gray))).then(
                     Text('name').then(
@@ -585,18 +667,26 @@ def register_command(server: PluginServerInterface):
                                     RColor.gray))).then(
                                         Text('name').runs(info))).
         then(
-            Literal('rename').runs(lambda src: src.reply(
+            add_literal_perm_check('rename').runs(lambda src: src.reply(
                 tr('usage.{}.rename', Prefix).set_color(RColor.gray))).then(
                     Text('name').then(
                         Text('new_name').in_length_range(
                             1, 16 - len(config.bot_prefix) -
                             len(config.bot_suffix)).runs(rename)))
         ).then(
-            Literal('move').runs(lambda src: src.reply(
+            add_literal_perm_check('move').runs(lambda src: src.reply(
                 tr('usage.{}.move', Prefix).set_color(RColor.gray))).then(
                     Text('name').then(
                         Float('x').then(
-                            Float('y').then(Float('z').runs(move)))))))
+                            Float('y').then(Float('z').runs(move)))))
+        ).then(
+            add_literal_perm_check('setorder').runs(lambda src: src.reply(
+                tr('usage.{}.setorder', Prefix).set_color(RColor.gray))).then(
+                    Text('name').then(
+                        Literal('add').then(
+                            Integer('i').runs(updateorder))).then(
+                                Literal('to').then(
+                                    Integer('i').runs(setorder))))))
 
 
 def on_load(server: PluginServerInterface, old_module):
