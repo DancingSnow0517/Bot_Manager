@@ -1,10 +1,10 @@
 {
 	"id": "bot_plugin",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"name": "Bot Plugin",
 	"description": "管理 carpet 机器人",
 	"author": "DancingSnow",
-	"link": "https://github.com/",
+	"link": "https://github.com/DancingSnow0517/Bot_Manager",
 	"resources": [
 		"resources",
 		"LICENSE"

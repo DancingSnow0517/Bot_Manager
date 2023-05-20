@@ -1,7 +1,9 @@
 # Bot Manager
 
 一个 [MCDReforged](https://github.com/Fallen-Breath/MCDReforged) 插件，需要 `2.3.0` 以上
+
 依赖于fabric-carpet
+
 与FZ生存数据包有（可避让的）冲突
 
 ### 命令
@@ -18,6 +20,7 @@
 !!bot rename 重命名bot，位置与命令不变
 !!bot run 运行bot的命令
 !!bot setcmd 编辑bot的命令
+!!bot setorder 编辑bot的显示顺序
 ```
 
 ### 配置
@@ -26,5 +29,6 @@
 "bots": 储存的bot列表，默认提供一个样例bot
 "bot_prefix": bot的前缀，默认为无，请与fabric-carpet配置fakePlayerNamePrefix一致
 "bot_suffix": bot的后缀，默认为无，请与fabric-carpet配置fakePlayerNameSuffix一致
+"display_order": !!bot list指令中bot的顺序，可为alphabetic（名字的字典序）和numeric（自定义数值序）
 "fz_pack_tolerate": 与FZ生存数据包冲突的避让策略，默认为false，即不避让，保持/player指令可用
 ```
