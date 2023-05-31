@@ -4,8 +4,8 @@ from mcdreforged.utils.serializer import Serializable
 
 
 class CommandInfo(Serializable):
-    cmd: str = 'spawn'
-    color: str = '#ED6DF1'
+    cmd: str = ''
+    color: str = '#FFFFFF'
 
 
 class BotInfo(Serializable):
@@ -13,22 +13,33 @@ class BotInfo(Serializable):
     rotation: List[float] = [0, 0]
     dim: str = 'minecraft:overworld'
     commands: Dict[str, CommandInfo] = []
+    display_index: int = 0
 
 
 class Config(Serializable):
     bots: Dict[str, BotInfo] = {
-        "test": BotInfo(pos=[0, 0, 0], rotation=[0, 0], commands={
-            "S": CommandInfo(cmd='spawn', color='#F2ACDA')
-        })
+        'demo':
+        BotInfo(pos=[0, 0, 0],
+                rotation=[0, 0],
+                display_index=0,
+                commands={
+                    's': CommandInfo(cmd='spawn', color='#00FFFF'),
+                    'k': CommandInfo(cmd='kill', color='#FF0000')
+                })
     }
     command_perm: Dict[str, int] = {
-        "list": 0,
-        "add": 2,
-        "remove": 2,
-        "modify": 2,
-        "run": 0,
-        "reload": 2,
-        "info": 0
+        'add': 2,
+        'list': 0,
+        'del': 2,
+        'info': 0,
+        'moveto': 2,
+        'reload': 3,
+        'rename': 2,
+        'run': 1,
+        'setcmd': 2,
+        'setorder': 2,
     }
     bot_prefix: str = ''
     bot_suffix: str = ''
+    display_order: str = 'none'
+    fz_pack_tolerate: bool = False
